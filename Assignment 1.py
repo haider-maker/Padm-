@@ -8,6 +8,7 @@ class HarryPotterEnv(gym.Env):
         self.grid_size = grid_size #self is like this in our language it's pointing toward something 
         self.agent_state = np.array([1,1])#using npies array object 
         self.goal_state = np.array([9,9]) #default pos where the goal is placed
+        self.hurdles = [np.array([2, 2]), np.array([3, 4]), np.array([5, 5]), np.array([1, 7]), np.array([7, 1])]  # 5 hurdles
         self.action_space = gym.spaces.Discrete(4) #consit of fnitely manly element in our case 25 elements. 4 possible actions up,dwm.....
         self.observationobservation_space = gym.spaces.Box(low=0, high=self.grid_size, shape=(2,)) #??? both line 17 and 18 are setting up the 5x5 grid starting lowest point as 0 and going up till 4 coz in python the the upper bound is one less then the written 
         self.fig, self.ax = plt.subplots() #plot in a plot 
@@ -30,6 +31,13 @@ class HarryPotterEnv(gym.Env):
         elif action == 3 and self.agent_state[0] < self.grid_size: # right
             self.agent_state[0] += 1
         
+        # Check if hit a hurdle
+        for hurdle in self.hurdles:
+            if np.array_equal(self.agent_state, hurdle):
+                print("Hit a hurdle! Resetting environment.")
+                obs = self.reset()
+                return obs, -5, False, {"reason": "hurdle"}
+            
         reward = 0
         done = np.array_equal(self.agent_state,self.goal_state) #array equal is comapring the two arrays which is goal state and the agent state. It returns the 1 if both arrays are equal and retuen 0 otherwise 
 
@@ -46,6 +54,9 @@ class HarryPotterEnv(gym.Env):
         self.ax.clear()#buildin clearing the screen 
         self.ax.plot(self.agent_state[0],self.agent_state[1],"ro") # writing the x axis and y axis separately , ro is the buildin means red dot 
         self.ax.plot(self.goal_state[0],self.goal_state[1],"g+") 
+         # draw hurdles
+        for h in self.hurdles:
+            self.ax.plot(h[0], h[1], "rx")  # hurdle (red X)
         self.ax.set_xlim(-1,self.grid_size) #for out own ease we are making it from -1 till the grid size
         self.ax.set_ylim(-1,self.grid_size)
         self.ax.set_aspect('equal') #equally distribute the aspect ratio 
