@@ -1,6 +1,7 @@
 import  gymnasium as gym #is openai lib for the environment 
 import numpy as np #is the lib for maths 
 import matplotlib.pyplot as plt #the lib for the grding and plots 
+import matplotlib.image as mpimg
 
 class HarryPotterEnv(gym.Env):
     def __init__(self, grid_size=10):
@@ -11,6 +12,7 @@ class HarryPotterEnv(gym.Env):
         self.current_goal_idx = 0
         self.goal_state = np.array([9,9]) #default pos where the goal is placed
         self.hurdles = [np.array([2, 2]), np.array([3, 4]), np.array([5, 5]), np.array([1, 7]), np.array([7, 1])]  # 5 hurdles
+        self.goal_img = mpimg.imread("nagini.png")  # Load your image once
         self.action_space = gym.spaces.Discrete(4) #consit of fnitely manly element in our case 25 elements. 4 possible actions up,dwm.....
         self.observationobservation_space = gym.spaces.Box(low=0, high=self.grid_size, shape=(2,)) #??? both line 17 and 18 are setting up the 5x5 grid starting lowest point as 0 and going up till 4 coz in python the the upper bound is one less then the written 
         self.fig, self.ax = plt.subplots() #plot in a plot 
@@ -58,10 +60,12 @@ class HarryPotterEnv(gym.Env):
     def render(self):
         self.ax.clear()#buildin clearing the screen 
         self.ax.plot(self.agent_state[0],self.agent_state[1],"ro") # writing the x axis and y axis separately , ro is the buildin means red dot 
-        # Draw all goals
+        
+        # Draw all goals as image
         for idx, goal in enumerate(self.goals):
-            color = "g+" if idx != self.current_goal_idx else "y*"
-            self.ax.plot(goal[0], goal[1], color)
+            x, y = goal
+            # Scale down image to fit grid cell
+            self.ax.imshow(self.goal_img, extent=[x - 0.4, x + 0.4, y - 0.4, y + 0.4], zorder=1)
 
         # draw hurdles
         for h in self.hurdles:
