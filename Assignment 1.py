@@ -7,6 +7,8 @@ class HarryPotterEnv(gym.Env):
         super().__init__() #default func and gives power to the class 
         self.grid_size = grid_size #self is like this in our language it's pointing toward something 
         self.agent_state = np.array([1,1])#using npies array object 
+        self.goals = [np.array([2, 5]), np.array([5, 4]),np.array([5, 8]),np.array([7, 3]),np.array([1, 8]),np.array([9, 9])]
+        self.current_goal_idx = 0
         self.goal_state = np.array([9,9]) #default pos where the goal is placed
         self.hurdles = [np.array([2, 2]), np.array([3, 4]), np.array([5, 5]), np.array([1, 7]), np.array([7, 1])]  # 5 hurdles
         self.action_space = gym.spaces.Discrete(4) #consit of fnitely manly element in our case 25 elements. 4 possible actions up,dwm.....
@@ -37,24 +39,31 @@ class HarryPotterEnv(gym.Env):
                 print("Hit a hurdle! Resetting environment.")
                 obs = self.reset()
                 return obs, -5, False, {"reason": "hurdle"}
-            
+        # Check current goal
         reward = 0
-        done = np.array_equal(self.agent_state,self.goal_state) #array equal is comapring the two arrays which is goal state and the agent state. It returns the 1 if both arrays are equal and retuen 0 otherwise 
-
-        if done: #if done = 1 (true) 
+        done = False
+        if np.array_equal(self.agent_state, self.goals[self.current_goal_idx]):
+            print(f"Reached goal {self.current_goal_idx + 1}!")
             reward = 10
-        else:
-            pass #do nothing basic pyhton 
+            self.current_goal_idx += 1
+            if self.current_goal_idx >= len(self.goals):
+                done = True
+                print("🎯 All goals reached!")  
 
-        info = {"distance to goal":self.goal_state - self.agent_state} #for my info giving me the distance how far the goal is right now 
-
+        info = {"goals_remaining": len(self.goals) - self.current_goal_idx,
+            "current_target": self.goals[self.current_goal_idx - 1] if self.current_goal_idx > 0 else self.goals[0]}
+        
         return self.agent_state, reward, done, info 
     
     def render(self):
         self.ax.clear()#buildin clearing the screen 
         self.ax.plot(self.agent_state[0],self.agent_state[1],"ro") # writing the x axis and y axis separately , ro is the buildin means red dot 
-        self.ax.plot(self.goal_state[0],self.goal_state[1],"g+") 
-         # draw hurdles
+        # Draw all goals
+        for idx, goal in enumerate(self.goals):
+            color = "g+" if idx != self.current_goal_idx else "y*"
+            self.ax.plot(goal[0], goal[1], color)
+
+        # draw hurdles
         for h in self.hurdles:
             self.ax.plot(h[0], h[1], "rx")  # hurdle (red X)
         self.ax.set_xlim(-1,self.grid_size) #for out own ease we are making it from -1 till the grid size
@@ -68,7 +77,7 @@ class HarryPotterEnv(gym.Env):
 if __name__=="__main__": # double underscore is the important syntax mtlab this is patthar par lakeer or yai hokr hi rhay ga always true, its needed coz we want to run the code in this block at any cost 
     env = HarryPotterEnv()
     state = env.reset() 
-    for _ in range(500):
+    for _ in range(50000):
         action = env.action_space.sample() #randomly taking the descion up, down, left, right and action spce is the descrete(4) already discuused in the code randomly take any action from the 4
         state,reward,done,info = env.step(action) #
         env.render()
