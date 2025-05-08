@@ -7,7 +7,7 @@ class HarryPotterEnv(gym.Env):
         super().__init__() #default func and gives power to the class 
         self.grid_size = grid_size #self is like this in our language it's pointing toward something 
         self.agent_state = np.array([1,1])#using npies array object 
-        self.goal_state = np.array([4,4]) #default pos where the goal is placed
+        self.goal_state = np.array([9,9]) #default pos where the goal is placed
         self.action_space = gym.spaces.Discrete(4) #consit of fnitely manly element in our case 25 elements. 4 possible actions up,dwm.....
         self.observationobservation_space = gym.spaces.Box(low=0, high=self.grid_size, shape=(2,)) #??? both line 17 and 18 are setting up the 5x5 grid starting lowest point as 0 and going up till 4 coz in python the the upper bound is one less then the written 
         self.fig, self.ax = plt.subplots() #plot in a plot 
