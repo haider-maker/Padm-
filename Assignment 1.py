@@ -3,7 +3,7 @@ import numpy as np #is the lib for maths
 import matplotlib.pyplot as plt #the lib for the grding and plots 
 
 class HarryPotterEnv(gym.Env):
-    def __init__(self, grid_size=5):
+    def __init__(self, grid_size=10):
         super().__init__() #default func and gives power to the class 
         self.grid_size = grid_size #self is like this in our language it's pointing toward something 
         self.agent_state = np.array([1,1])#using npies array object 
