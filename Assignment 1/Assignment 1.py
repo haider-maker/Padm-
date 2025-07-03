@@ -10,9 +10,19 @@ class HarryPotterEnv(gym.Env):
         self.agent_state = np.array([1,1])#using npies array object 
         self.goals = [np.array([2, 5]), np.array([5, 4]),np.array([5, 8]),np.array([7, 3]),np.array([1, 8]),np.array([9, 9])]
         self.current_goal_idx = 0
-        self.goal_state = np.array([9,9]) #default pos where the goal is placed
+        #self.goal_state = np.array([9,9]) #default pos where the goal is placed
         self.hurdles = [np.array([2, 2]), np.array([3, 4]), np.array([5, 5]), np.array([1, 7]), np.array([7, 1])]  # 5 hurdles
-        self.goal_img = mpimg.imread("nagini.png")  # Load your image once
+        # LOAD DIFFERENT IMAGES FOR EACH GOAL
+        self.goal_imgs = [
+            mpimg.imread("dairy.png"),
+            mpimg.imread("nagini.png"),
+            mpimg.imread("cup.jpeg"),
+            mpimg.imread("diadem.png"),
+            mpimg.imread("locket.png"),
+            mpimg.imread("ring.jpg"),
+        ]
+         # Load single hurdle image
+        self.hurdle_img = mpimg.imread("deatheater.png") 
         self.action_space = gym.spaces.Discrete(4) #consit of fnitely manly element in our case 25 elements. 4 possible actions up,dwm.....
         self.observationobservation_space = gym.spaces.Box(low=0, high=self.grid_size, shape=(2,)) #??? both line 17 and 18 are setting up the 5x5 grid starting lowest point as 0 and going up till 4 coz in python the the upper bound is one less then the written 
         self.fig, self.ax = plt.subplots() #plot in a plot 
@@ -65,13 +75,24 @@ class HarryPotterEnv(gym.Env):
         for idx, goal in enumerate(self.goals):
             x, y = goal
             # Scale down image to fit grid cell
-            self.ax.imshow(self.goal_img, extent=[x - 0.4, x + 0.4, y - 0.4, y + 0.4], zorder=1)
+            img = self.goal_imgs[idx]  
+            self.ax.imshow(
+                img,
+                extent=[x - 0.4, x + 0.4, y - 0.4, y + 0.4],
+                zorder=1,
+            )
+
 
         # draw hurdles
         for h in self.hurdles:
-            self.ax.plot(h[0], h[1], "rx")  # hurdle (red X)
-        self.ax.set_xlim(-1,self.grid_size) #for out own ease we are making it from -1 till the grid size
-        self.ax.set_ylim(-1,self.grid_size)
+            x, y = h
+            self.ax.imshow(
+                self.hurdle_img,
+                extent=[x - 0.4, x + 0.4, y - 0.4, y + 0.4],
+                zorder=1,
+            ) # hurdle (as one image)
+        self.ax.set_xlim(0,self.grid_size) #for out own ease we are making it from -1 till the grid size
+        self.ax.set_ylim(0,self.grid_size)
         self.ax.set_aspect('equal') #equally distribute the aspect ratio 
         plt.pause(0.1) #taking the next step with pause of 0.1 sec for our ease 
 
