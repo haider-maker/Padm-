@@ -93,8 +93,9 @@ def visualize_q_table(hurdle_coordinates=[(2, 1), (0, 4)],
         q_table = np.load(q_values_path)
 
         # Create subplots for each action:
-        # --------------------------------
-        _, axes = plt.subplots(1, 4, figsize=(20, 5))
+         # Create 2x2 subplots
+        fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+        axes = axes.flatten()
 
         for i, action in enumerate(actions):
             ax = axes[i]
@@ -103,18 +104,19 @@ def visualize_q_table(hurdle_coordinates=[(2, 1), (0, 4)],
             # Mask the goal state's Q-value for visualization:
             # ------------------------------------------------
             mask = np.zeros_like(heatmap_data, dtype=bool)
-            mask[goal_coordinates] = True
-            mask[hurdle_coordinates[0]] = True
-            mask[hurdle_coordinates[1]] = True
+            for gx, gy in goal_coordinates:
+                mask[gx, gy] = True
+            for hx, hy in hurdle_coordinates:
+                mask[hx, hy] = True
 
             sns.heatmap(
-                np.flipud(heatmap_data),
+                heatmap_data,
                 annot=True,
                 fmt=".2f",
                 cmap="viridis",
                 ax=ax,
                 cbar=False,
-                mask=np.flipud(mask),
+                mask=mask,
                 annot_kws={"size": 9})
             
             ax.invert_yaxis()
