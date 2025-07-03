@@ -3,7 +3,7 @@ import numpy as np #is the lib for maths
 import matplotlib.pyplot as plt #the lib for the grding and plots 
 import matplotlib.image as mpimg
 from constants import GOAL_COORDINATES, HURDLE_COORDINATES
-
+import random 
 
 class HarryPotterEnv(gym.Env):
     def __init__(self, grid_size=10, goals=None, hurdles=None):
@@ -67,6 +67,10 @@ class HarryPotterEnv(gym.Env):
             print(f"Reached goal {self.current_goal_idx + 1}!")
             reward = 10
             self.current_goal_idx += 1
+            rand_x = random.randint (1,9)
+            rand_y = random.randint (1,9)
+            # Teleport to start after each goal
+            self.agent_state = np.array([rand_x, rand_y])
             if self.current_goal_idx >= len(self.goals):
                 done = True
                 print("🎯 All goals reached!")

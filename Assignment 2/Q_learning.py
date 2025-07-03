@@ -3,7 +3,7 @@
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-
+import time
 
 # Function 1: Train Q-learning agent
 # -----------
@@ -14,7 +14,7 @@ def train_q_learning(env,
                      epsilon_decay,
                      alpha,
                      gamma,
-                     q_table_save_path="q_table.npy"):
+                     q_table_save_path=None):
 
     # Initialize the Q-table:
     # -----------------------
@@ -69,15 +69,21 @@ def train_q_learning(env,
     #! -------
     env.close()
     print("Training finished.\n")
+    # Generate unique filename
+    timestamp = time.strftime("%Y%m%d-%H%M%S")
+    save_filename = f"q_table_{timestamp}.npy"
+
+    np.save(save_filename, q_table)
+    print(f"Saved the Q-table to {save_filename}")
 
     #! Step 8: Save the trained Q-table
     #! -------
-    np.save(q_table_save_path, q_table)
-    print("Saved the Q-table.")
-    print("Final Q-table:")
+    # np.save(q_table_save_path, q_table)
+    # print("Saved the Q-table.")
+    # print("Final Q-table:")
     # for state, actions in q_table.items():
     #     print(f"State {state}: {actions}")
-    print(q_table)
+    # print(q_table)
 
 # Function 2: Visualize the Q-table
 # -----------
