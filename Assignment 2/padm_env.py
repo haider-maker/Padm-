@@ -64,23 +64,31 @@ class HarryPotterEnv(gym.Env):
         reward = 0
         done = False
         if np.array_equal(self.agent_state, self.goals[self.current_goal_idx]):
-            print(f"Reached goal {self.current_goal_idx + 1}!")
-            reward = 10
-            self.current_goal_idx += 1
-            rand_x = random.randint (1,9)
-            rand_y = random.randint (1,9)
-            # Teleport to start after each goal
-            self.agent_state = np.array([rand_x, rand_y])
-            if self.current_goal_idx >= len(self.goals):
-                done = True
-                print("🎯 All goals reached!")
+             print(f"Reached goal {self.current_goal_idx + 1}!")
+        reward = 10
+        self.current_goal_idx += 1
+
+        if self.current_goal_idx >= len(self.goals):
+            done = True
+            print("🎯 All goals reached!")
+        else:
+            # teleport randomly
+            while True:
+                rand_x = random.randint(1, 9)
+                rand_y = random.randint(1, 9)
+                rand_pos = np.array([rand_x, rand_y])
+                if not np.array_equal(rand_pos, self.goals[self.current_goal_idx]):
+                    break
+            self.agent_state = rand_pos
+            print(f"Teleported to {tuple(self.agent_state)} for next goal.")
+            done = False
 
         info = {
             "goals_remaining": len(self.goals) - self.current_goal_idx,
-            "current_target": self.goals[self.current_goal_idx - 1] if self.current_goal_idx > 0 else self.goals[0]
+            "current_target": None if self.current_goal_idx >= len(self.goals) else self.goals[self.current_goal_idx]
         }
-
         return tuple(self.agent_state), reward, done, info
+
 
 
     def render(self):
