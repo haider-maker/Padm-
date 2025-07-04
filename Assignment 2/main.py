@@ -32,10 +32,10 @@ from padm_env import create_env
 from constants import GOAL_COORDINATES, HURDLE_COORDINATES
 
 def run_inference(
-    q_table_path="q_table_20250704-004058.npy",
+    q_table_path="q_table_20250704-024625.npy",
     random_initialization=True,
     render=True,
-    delay=5.5
+    delay=1000
 ):
     """
     Run a single episode of the environment using a trained Q-table.
