@@ -6,9 +6,10 @@ from constants import GOAL_COORDINATES, HURDLE_COORDINATES
 import random 
 
 class HarryPotterEnv(gym.Env):
-    def __init__(self, grid_size=10, goals=None, hurdles=None):
+    def __init__(self, grid_size=10, goals=None, hurdles=None, random_initialization=False):
         super().__init__() 
         self.grid_size = grid_size 
+        self.random_initialization = random_initialization
         self.agent_state = np.array([1,1])
         self.goals = [np.array(g) for g in goals] if goals is not None else []
         self.current_goal_idx = 0
@@ -28,8 +29,14 @@ class HarryPotterEnv(gym.Env):
         plt.show(block=False) 
 
     def reset(self, seed=None, options=None):
-        self.agent_state = np.array([1,1])
-        #self.current_goal_idx = 0
+        if self.random_initialization:
+            self.agent_state = np.array([
+                random.randint(0, self.grid_size - 1),
+                random.randint(0, self.grid_size - 1)
+            ])
+        else:
+            self.agent_state = np.array([1, 1])
+        self.current_goal_idx = 0
         return tuple(self.agent_state), {}
 
     def step(self, action):
@@ -65,10 +72,10 @@ class HarryPotterEnv(gym.Env):
         done = False
         if np.array_equal(self.agent_state, self.goals[self.current_goal_idx]):
             print(f"Reached goal {self.current_goal_idx + 1}!")
-            self.render()
-            plt.pause(0.001)
-            import time
-            time.sleep(1.5)
+            # self.render()
+            # plt.pause(0.001)
+            # import time
+            # time.sleep(1.5)
 
             reward = 10
             self.current_goal_idx += 1
@@ -76,24 +83,7 @@ class HarryPotterEnv(gym.Env):
             if self.current_goal_idx >= len(self.goals):
                 done = True
                 print("🎯 All goals reached!")
-        # reward = 10
-        # self.current_goal_idx += 1
-
-        # if self.current_goal_idx >= len(self.goals):
-        #     done = True
-        #     print("🎯 All goals reached!")
-        else:
-            # teleport randomly
-            while True:
-                rand_x = random.randint(1, 9)
-                rand_y = random.randint(1, 9)
-                rand_pos = np.array([rand_x, rand_y])
-                if not any(np.array_equal(rand_pos, g) for g in self.goals):
-                    break
-            self.agent_state = rand_pos
-            print(f"Teleported to {tuple(self.agent_state)} for next goal.")
-            done = False
-
+        
         info = {
             "goals_remaining": len(self.goals) - self.current_goal_idx,
             "current_target": None if self.current_goal_idx >= len(self.goals) else self.goals[self.current_goal_idx]
@@ -155,7 +145,8 @@ def create_env(goal_coordinates,
     env = HarryPotterEnv(
         grid_size=10,
         goals=goal_coordinates,
-        hurdles=hurdle_coordinates
+        hurdles=hurdle_coordinates,
+        random_initialization=random_initialization
     )
     return env
 
