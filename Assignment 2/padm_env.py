@@ -9,13 +9,15 @@ class HarryPotterEnv(gym.Env):
     def __init__(self, grid_size=10, goals=None, hurdles=None, random_initialization=False):
         super().__init__()
         self.grid_size = grid_size
+        self.bg_img = mpimg.imread("bg10.jpeg")
         self.random_initialization = random_initialization
         self.visited_goal = False
         self.agent_state = np.array([1, 1])
         self.goal = np.array(goals[0]) if goals else None
         self.hurdles = [np.array(h) for h in hurdles] if hurdles is not None else []
-        self.goal_img = mpimg.imread("dairy.png")
-        self.hurdle_img = mpimg.imread("deatheater.png")
+        self.goal_img = mpimg.imread("vold5.png")
+        self.hurdle_img = mpimg.imread("DE7.png")
+        self.agent_img = mpimg.imread("wand.png")
         self.action_space = gym.spaces.Discrete(4)
         self.observation_space = gym.spaces.Box(low=0, high=self.grid_size - 1, shape=(2,), dtype=np.int32)
         self.fig, self.ax = plt.subplots()
@@ -90,26 +92,23 @@ class HarryPotterEnv(gym.Env):
         return tuple(self.agent_state), reward, done, info
 
     def render(self):
+
         self.ax.clear()
-        self.ax.set_facecolor("#000000")
 
-        # Draw grid
-        self.ax.set_xticks(np.arange(0, self.grid_size + 1))
-        self.ax.set_yticks(np.arange(0, self.grid_size + 1))
-        self.ax.set_xlim(0, self.grid_size)
-        self.ax.set_ylim(0, self.grid_size)
-        self.ax.set_xlabel("X")
-        self.ax.set_ylabel("Y")
-        self.ax.grid(True, which='both', color='gray', linestyle='-', linewidth=0.5)
-
-        # Draw agent
-        self.ax.plot(
-            self.agent_state[0] + 0.5,
-            self.agent_state[1] + 0.5,
-            "ro",
-            markersize=12,
+         # Draw background
+        self.ax.imshow(
+            self.bg_img,
+            extent=[0, self.grid_size, 0, self.grid_size],
+            zorder=0,
         )
 
+        # Move the agent image
+        x, y = self.agent_state
+        self.agent_im_obj = self.ax.imshow(
+            self.agent_img,
+            extent=[x, x + 1, y, y + 1],
+            zorder=2,
+        )
         # Draw goal
         if self.goal is not None:
             x, y = self.goal
@@ -127,8 +126,18 @@ class HarryPotterEnv(gym.Env):
                 extent=[x, x + 1, y, y + 1],
                 zorder=1,
             )
-
-        self.ax.set_aspect("equal")
+         # Draw grid
+        self.ax.set_xticks([])
+        self.ax.set_yticks([])
+        self.ax.axis("off")
+        self.ax.set_xlim(0, self.grid_size)
+        self.ax.set_ylim(0, self.grid_size)
+        self.fig.tight_layout(pad=0)
+        plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+        #self.ax.set_xlabel("X")
+        #self.ax.set_ylabel("Y")
+        #self.ax.grid(True, which='both', color='gray', linestyle='-', linewidth=0.5)
+        plt.draw()
         plt.pause(0.1)
 
     def close(self):
