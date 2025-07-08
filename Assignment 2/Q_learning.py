@@ -110,11 +110,14 @@ def visualize_q_table(hurdle_coordinates=[(2, 1), (0, 4)],
             ax = axes[i]
             heatmap_data = q_table[:, :, i].copy()
 
-            # Mask the goal state's Q-value for visualization:
-            # ------------------------------------------------
+           # Create mask for visualization
             mask = np.zeros_like(heatmap_data, dtype=bool)
+
+            # Mask the single goal cell
             for gx, gy in goal_coordinates:
                 mask[gx, gy] = True
+
+            # Mask hurdles
             for hx, hy in hurdle_coordinates:
                 mask[hx, hy] = True
 

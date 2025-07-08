@@ -17,7 +17,7 @@ visualize_results = True
 NOTE: Sometimes a fixed initializtion might push the agent to a local minimum.
 In this case, it is better to use a random initialization.  
 """
-random_initialization = True  # If True, the Q-table will be initialized randomly
+random_initialization = False # If True, the Q-table will be initialized randomly
 
 learning_rate = 0.01  # Learning rate
 gamma = 0.99  # Discount factor
@@ -32,7 +32,7 @@ from padm_env import create_env
 from constants import GOAL_COORDINATES, HURDLE_COORDINATES
 
 def run_inference(
-    q_table_path="q_table_20250708-125537.npy",
+    q_table_path="q_table.npy",
     random_initialization=False,
     render=True,
     delay=1000
@@ -94,8 +94,8 @@ def run_inference(
 
 if test:
     run_inference(
-    q_table_path="q_table_20250708-132136.npy",
-    random_initialization=True,
+    q_table_path="q_table_20250708-135133.npy",
+    random_initialization=False,
     render=True,
     delay=0.2)
 # Execute:
@@ -121,5 +121,5 @@ if visualize_results:
         visualize_q_table(
             hurdle_coordinates=hurdle_coordinates,
             goal_coordinates=goal_coordinates, 
-            q_values_path="q_table_20250708-132136.npy")
+            q_values_path="q_table_20250708-135133.npy")
 
