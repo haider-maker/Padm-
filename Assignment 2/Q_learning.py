@@ -5,6 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import time
 
+
 # Function 1: Train Q-learning agent
 # -----------
 def train_q_learning(env,
@@ -14,7 +15,9 @@ def train_q_learning(env,
                      epsilon_decay,
                      alpha,
                      gamma,
-                     q_table_save_path=None):
+                     q_table_save_path=None,
+                     max_steps=500
+                     ):
 
     # Initialize the Q-table:
     # -----------------------
@@ -32,7 +35,7 @@ def train_q_learning(env,
 
         #! Step 2: Take actions in the environment until "Done" flag is triggered
         #! -------
-        while True:
+        for step in range(max_steps):
             #! Step 3: Define your Exploration vs. Exploitation
             #! -------
             if np.random.rand() < epsilon:

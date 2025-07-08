@@ -15,4 +15,5 @@ HURDLE_COORDINATES = [
     (5, 5),
     (1, 7),
     (7, 1),
+    
 ]

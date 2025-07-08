@@ -9,8 +9,8 @@ hurdle_coordinates = HURDLE_COORDINATES
 
 # User definitions:
 # -----------------
-train = False
-test= True
+train = True
+test= False
 visualize_results = True
 
 """
@@ -32,7 +32,7 @@ from padm_env import create_env
 from constants import GOAL_COORDINATES, HURDLE_COORDINATES
 
 def run_inference(
-    q_table_path="q_table_20250704-024625.npy",
+    q_table_path="q_table_20250704-045522.npy",
     random_initialization=True,
     render=True,
     delay=1000
