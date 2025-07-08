@@ -32,8 +32,8 @@ from padm_env import create_env
 from constants import GOAL_COORDINATES, HURDLE_COORDINATES
 
 def run_inference(
-    q_table_path="q_table_20250708-113259.npy",
-    random_initialization=True,
+    q_table_path="q_table_20250708-125537.npy",
+    random_initialization=False,
     render=True,
     delay=1000
 ):
@@ -94,7 +94,7 @@ def run_inference(
 
 if test:
     run_inference(
-    q_table_path="q_table.npy",
+    q_table_path="q_table_20250708-132136.npy",
     random_initialization=True,
     render=True,
     delay=0.2)
@@ -121,5 +121,5 @@ if visualize_results:
         visualize_q_table(
             hurdle_coordinates=hurdle_coordinates,
             goal_coordinates=goal_coordinates, 
-            q_values_path="q_table.npy")
+            q_values_path="q_table_20250708-132136.npy")
 

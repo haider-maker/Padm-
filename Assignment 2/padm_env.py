@@ -10,6 +10,7 @@ class HarryPotterEnv(gym.Env):
         super().__init__() 
         self.grid_size = grid_size 
         self.random_initialization = random_initialization
+        self.visited_goals = set()
         self.agent_state = np.array([1,1])
         self.goals = [np.array(g) for g in goals] if goals is not None else []
         self.current_goal_idx = 0
@@ -37,6 +38,7 @@ class HarryPotterEnv(gym.Env):
         else:
             self.agent_state = np.array([1, 1])
         self.current_goal_idx = 0
+        self.visited_goals = set() 
         return tuple(self.agent_state), {}
 
     def step(self, action):
@@ -68,25 +70,33 @@ class HarryPotterEnv(gym.Env):
                 }
                 return tuple(self.agent_state), reward, False, info
 
+        # Check goals
+        goal_reached = False
+        for goal in self.goals:
+            if np.array_equal(self.agent_state, goal):
+                if tuple(goal) in self.visited_goals:
+                    print(f"Revisited goal {tuple(goal)}. Penalizing agent.")
+                    reward = -5
+                else:
+                    print(f"Reached new goal at {tuple(goal)}!")
+                    reward = 10
+                    self.current_goal_idx += 1
+                    self.visited_goals.add(tuple(goal))
+                    goal_reached = True
+
+                done = len(self.visited_goals) == len(self.goals)
+                info = {
+                    "goals_remaining": len(self.goals) - len(self.visited_goals),
+                    "current_target": None if done else self.goals[self.current_goal_idx]
+                }
+                return tuple(self.agent_state), reward, done, info
+
+        # Otherwise normal move
         reward = 0
         done = False
-        if np.array_equal(self.agent_state, self.goals[self.current_goal_idx]):
-            print(f"Reached goal {self.current_goal_idx + 1}!")
-            # self.render()
-            # plt.pause(0.001)
-            # import time
-            # time.sleep(1.5)
-
-            reward = 10
-            self.current_goal_idx += 1
-
-            if self.current_goal_idx >= len(self.goals):
-                done = True
-                print("🎯 All goals reached!")
-        
         info = {
-            "goals_remaining": len(self.goals) - self.current_goal_idx,
-            "current_target": None if self.current_goal_idx >= len(self.goals) else self.goals[self.current_goal_idx]
+            "goals_remaining": len(self.goals) - len(self.visited_goals),
+            "current_target": self.goals[self.current_goal_idx] if self.current_goal_idx < len(self.goals) else None
         }
         return tuple(self.agent_state), reward, done, info
 
