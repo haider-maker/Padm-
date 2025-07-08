@@ -7,22 +7,24 @@ class HarryPotterEnv(gym.Env):
     def __init__(self, grid_size=10):
         super().__init__() #default func and gives power to the class 
         self.grid_size = grid_size #self is like this in our language it's pointing toward something 
+        self.bg_img = mpimg.imread("bg10.jpeg")
         self.agent_state = np.array([1,1])#using npies array object 
-        self.goals = [np.array([2, 5]), np.array([5, 4]),np.array([5, 8]),np.array([7, 3]),np.array([1, 8]),np.array([9, 9])]
+        self.goals = [np.array([2, 5]), np.array([5, 1]),np.array([5, 8]),np.array([7, 3]),np.array([1, 8]),np.array([9, 9])]
         self.current_goal_idx = 0
+        self.agent_img = mpimg.imread("wand.png")
         #self.goal_state = np.array([9,9]) #default pos where the goal is placed
-        self.hurdles = [np.array([2, 2]), np.array([3, 4]), np.array([5, 5]), np.array([1, 7]), np.array([7, 1])]  # 5 hurdles
+        self.hurdles = [np.array([1, 5]), np.array([2,7]), np.array([4,3]), np.array([3,8]), np.array([5,5]),np.array([6,8]),np.array([7,2]), np.array([7,6]),np.array([8,3]),np.array([8,7])] 
         # LOAD DIFFERENT IMAGES FOR EACH GOAL
         self.goal_imgs = [
-            mpimg.imread("dairy.png"),
-            mpimg.imread("nagini.png"),
-            mpimg.imread("cup.jpeg"),
-            mpimg.imread("diadem.png"),
-            mpimg.imread("locket.png"),
-            mpimg.imread("ring.jpg"),
+            mpimg.imread("diary1.png"),
+            mpimg.imread("snake.png"),
+            mpimg.imread("cup2.png"),
+            mpimg.imread("diadem5.png"),
+            mpimg.imread("locket2.png"),
+            mpimg.imread("ring2.png"),
         ]
          # Load single hurdle image
-        self.hurdle_img = mpimg.imread("deatheater.png") 
+        self.hurdle_img = mpimg.imread("DE7.png") 
         self.action_space = gym.spaces.Discrete(4) #consit of fnitely manly element in our case 25 elements. 4 possible actions up,dwm.....
         self.observationobservation_space = gym.spaces.Box(low=0, high=self.grid_size, shape=(2,)) #??? both line 17 and 18 are setting up the 5x5 grid starting lowest point as 0 and going up till 4 coz in python the the upper bound is one less then the written 
         self.fig, self.ax = plt.subplots() #plot in a plot 
@@ -45,13 +47,13 @@ class HarryPotterEnv(gym.Env):
         elif action == 3 and self.agent_state[0] < self.grid_size: # right
             self.agent_state[0] += 1
         
-        # Check if hit a hurdle
+          # Check if hit a hurdle
         for hurdle in self.hurdles:
             if np.array_equal(self.agent_state, hurdle):
                 print("Hit a hurdle! Resetting environment.")
                 obs = self.reset()
                 return obs, -5, False, {"reason": "hurdle"}
-        # Check current goal
+         # Check current goal
         reward = 0
         done = False
         if np.array_equal(self.agent_state, self.goals[self.current_goal_idx]):
@@ -60,41 +62,62 @@ class HarryPotterEnv(gym.Env):
             self.current_goal_idx += 1
             if self.current_goal_idx >= len(self.goals):
                 done = True
-                print("🎯 All goals reached!")  
+                print("All goals reached!")  
 
         info = {"goals_remaining": len(self.goals) - self.current_goal_idx,
             "current_target": self.goals[self.current_goal_idx - 1] if self.current_goal_idx > 0 else self.goals[0]}
         
         return self.agent_state, reward, done, info 
-    
     def render(self):
-        self.ax.clear()#buildin clearing the screen 
-        self.ax.plot(self.agent_state[0],self.agent_state[1],"ro") # writing the x axis and y axis separately , ro is the buildin means red dot 
+        self.ax.clear()
+        # Draw background
+        self.ax.imshow(
+            self.bg_img,
+            extent=[0, self.grid_size, 0, self.grid_size],
+            zorder=0,
+        )
+
+        # Draw grid
+        self.ax.set_xticks(np.arange(0, self.grid_size + 1))
+        self.ax.set_yticks(np.arange(0, self.grid_size + 1))
+        self.ax.set_xlim(0, self.grid_size)
+        self.ax.set_ylim(0, self.grid_size)
+        self.ax.set_xlabel("X", fontsize=14, color='white', fontweight='bold', family='cursive')
+        self.ax.set_ylabel("Y", fontsize=14, color='white', fontweight='bold', family='cursive')
+        #self.ax.grid(True, which='both', color='white', linestyle='-', linewidth=0.5)
+
+        # Draw agent
+        # Draw agent image
+        x, y = self.agent_state
+        self.ax.imshow(
+            self.agent_img,
+            extent=[x, x + 1, y, y + 1],
+            zorder=2,
+        )   
         
-        # Draw all goals as image
+
+        # Draw all goals
         for idx, goal in enumerate(self.goals):
+            goal_img = self.goal_imgs[idx]
             x, y = goal
-            # Scale down image to fit grid cell
-            img = self.goal_imgs[idx]  
             self.ax.imshow(
-                img,
-                extent=[x - 0.4, x + 0.4, y - 0.4, y + 0.4],
+                goal_img,
+                extent=[x, x + 1, y, y + 1],
                 zorder=1,
             )
 
-
-        # draw hurdles
+        # Draw hurdles
         for h in self.hurdles:
             x, y = h
             self.ax.imshow(
                 self.hurdle_img,
-                extent=[x - 0.4, x + 0.4, y - 0.4, y + 0.4],
+                extent=[x, x + 1, y, y + 1],
                 zorder=1,
-            ) # hurdle (as one image)
-        self.ax.set_xlim(0,self.grid_size) #for out own ease we are making it from -1 till the grid size
-        self.ax.set_ylim(0,self.grid_size)
-        self.ax.set_aspect('equal') #equally distribute the aspect ratio 
-        plt.pause(0.1) #taking the next step with pause of 0.1 sec for our ease 
+            )
+
+
+        self.ax.set_aspect("equal")
+        plt.pause(0.1)
 
     def close(self):
         plt.close()
